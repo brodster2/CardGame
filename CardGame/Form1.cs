@@ -19,9 +19,8 @@ namespace CardGame
         public Card firstCard;
         public Card secondCard;
         private int pairsFound = 0;          //this is incremented by Form.compare()
-        private int valcount = 1;
-
         Card[] deck;
+
         public Form1()
         {
             InitializeComponent();
@@ -31,8 +30,10 @@ namespace CardGame
         private void Form1_Load(object sender, EventArgs e)
         {
             createCards();
-            foreach(Card c in deck)
-                Controls.Add(c);
+
+            shuffle();
+
+            deal();
 
 
             //lblTurn.Text = turn + " turn";
@@ -113,6 +114,23 @@ namespace CardGame
             }
         }
 
+        private void deal()
+        {
+            int count = 0;
+            for (int x = 0; x < 13; x++)
+            {
+                for (int y = 0; y < 4; y++)
+                {
+                    deck[count].Parent = this;
+                    deck[count].Left = x * 100 + 50;
+                    deck[count].Top = y * 125 + 100;
+                    deck[count].Parent = this;
+                    this.Controls.Add(deck[count]);
+                    count++;
+                }
+            }
+        }
+
         public void compare(Card a, Card b)   //Called by Card.flip()
         {
             if (a.Value == b.Value)
@@ -143,7 +161,7 @@ namespace CardGame
     {
         public Form1 p;
         public int Value;
-        private Image Face;
+        public Image Face;
         private bool flipped = false;
 
         public Card(Image face, int value) : base()
