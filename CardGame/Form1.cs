@@ -101,7 +101,7 @@ namespace CardGame
             Card c1, c2, placeholder;
             int shuffles = 0;
 
-            while (shuffles < 0)
+            while (shuffles < 52)
             {
                 c1 = deck[dealer.Next(52)];
                 c2 = deck[dealer.Next(52)];
