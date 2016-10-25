@@ -14,25 +14,25 @@ namespace CardGame
 {
     public partial class Form1 : Form
     {
-        
-        public Form1()
-        {
-            InitializeComponent();
-            this.Load += new EventHandler(this.Form1_Load);
-        }
-
         public int turns = 0;                 //this is incremented by Card.flip()
         public int cardsFlipped = 0;
         public Card firstCard, secondCard;
         private int pairsFound = 0;          //this is incremented by Form.compare()
         Card[] deck = new Card[52];
 
+        public Form1()
+        {
+            InitializeComponent();
+            this.Load += new EventHandler(this.Form1_Load);
+        }
+
+
         private void Form1_Load(object sender, EventArgs e)
         {
 
             createCards();
 
-            shuffle();
+            //shuffle();  testing adding shuffle @ end of create cards
 
             deal();
 
@@ -95,34 +95,34 @@ namespace CardGame
             deck[49] = new Card(Properties.Resources.king_of_diamonds2 , 13);
             deck[50] = new Card(Properties.Resources.king_of_hearts2 , 13);
             deck[51] = new Card(Properties.Resources.king_of_spades2 , 13);
+            shuffle();
         }
 
         private void shuffle()
         {
             Random dealer = new Random();
-            Card c1, c2, placeholder;
+            Card placeholder;
             int shuffles = 0;
 
-            while (shuffles < 52) { 
-                c1 = deck[dealer.Next(52)];
-                c2 = deck[dealer.Next(52)];
-                placeholder = c2;
-                c2 = c1;
-                c1 = placeholder;
+            while (shuffles < 100) {
+                int r1 = dealer.Next(0, 52);
+                int r2 = dealer.Next(0, 52);
+                placeholder = deck[r1];
+                deck[r1] = deck[r2];
+                deck[r2] = placeholder;
 
                 shuffles++;
             }
         }
 
         private void deal()
-        {
-            MessageBox.Show("testing");
+        { 
 
-           Card test = new Card();
+           /*Card test = new Card();
 
             this.Controls.Add(test);
-            test.Show();
-            /*int count = 0;
+            test.Show(); */
+            int count = 0;
             for (int x = 0; x < 13; x++)
             {
                 for (int y = 0; y < 4; y++)
@@ -134,7 +134,7 @@ namespace CardGame
                     this.Controls.Add(deck[count]);
                     count++;
                 }
-            } */
+            } 
         }
 
         public void compare(Card a, Card b)   //Called by Card.flip()
@@ -170,15 +170,8 @@ namespace CardGame
         public Image Face;
         public bool flipped;
 
-        public Card() : base()
-        {
-            this.Height = 100;
-            this.Width = 75;
-            this.BackColor = Color.Red;
-            this.flipped = false;
-        }
 
-        public Card(Image face, int value) : base()
+        public Card(Image face, int value)
         {
             this.Width = 75;
             this.Height = 100;
@@ -197,15 +190,15 @@ namespace CardGame
 
             if (!flipped)
             {
-                this.Image = this.Face;
-                flipped = true;
 
                 if (p.cardsFlipped == 0)
                 {
+                    this.Image = this.Face;
                     p.firstCard = this;
+                    flipped = true;
                     p.cardsFlipped++;
                 }
-                else if (p.cardsFlipped < 2)
+                else //if (p.cardsFlipped < 2)
                 {
                     p.secondCard = this;
                     p.turns++;
