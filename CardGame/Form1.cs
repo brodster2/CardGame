@@ -14,21 +14,22 @@ namespace CardGame
 {
     public partial class Form1 : Form
     {
-        public int cardsFlipped = 0;
-        public int turns = 0;                 //this is incremented by Card.flip()
-        public Card firstCard;
-        public Card secondCard;
-        private int pairsFound = 0;          //this is incremented by Form.compare()
-        Card[] deck;
-
+        
         public Form1()
         {
             InitializeComponent();
+            this.Load += new EventHandler(this.Form1_Load);
         }
 
+        public int turns = 0;                 //this is incremented by Card.flip()
+        public int cardsFlipped = 0;
+        public Card firstCard, secondCard;
+        private int pairsFound = 0;          //this is incremented by Form.compare()
+        Card[] deck = new Card[52];
 
         private void Form1_Load(object sender, EventArgs e)
         {
+
             createCards();
 
             shuffle();
@@ -41,7 +42,7 @@ namespace CardGame
 
         private void createCards()
         {
-            deck = new Card[52];
+
             deck[0] = new Card(Properties.Resources.ace_of_clubs , 1);
             deck[1] = new Card(Properties.Resources.ace_of_diamonds , 1);
             deck[2] = new Card(Properties.Resources.ace_of_hearts , 1);
@@ -102,8 +103,7 @@ namespace CardGame
             Card c1, c2, placeholder;
             int shuffles = 0;
 
-            while (shuffles < 52)
-            {
+            while (shuffles < 52) { 
                 c1 = deck[dealer.Next(52)];
                 c2 = deck[dealer.Next(52)];
                 placeholder = c2;
@@ -116,7 +116,13 @@ namespace CardGame
 
         private void deal()
         {
-            int count = 0;
+            MessageBox.Show("testing");
+
+           Card test = new Card();
+
+            this.Controls.Add(test);
+            test.Show();
+            /*int count = 0;
             for (int x = 0; x < 13; x++)
             {
                 for (int y = 0; y < 4; y++)
@@ -128,7 +134,7 @@ namespace CardGame
                     this.Controls.Add(deck[count]);
                     count++;
                 }
-            }
+            } */
         }
 
         public void compare(Card a, Card b)   //Called by Card.flip()
@@ -162,7 +168,15 @@ namespace CardGame
         public Form1 p;
         public int Value;
         public Image Face;
-        private bool flipped = false;
+        public bool flipped;
+
+        public Card() : base()
+        {
+            this.Height = 100;
+            this.Width = 75;
+            this.BackColor = Color.Red;
+            this.flipped = false;
+        }
 
         public Card(Image face, int value) : base()
         {
@@ -171,8 +185,10 @@ namespace CardGame
             this.Left = 0;
             this.Top = 0;
             this.Image = global::CardGame.Properties.Resources.zblue_back;
+            this.SizeMode = PictureBoxSizeMode.StretchImage;
             this.Face = face;
             this.Value = value;
+            this.flipped = false;
             this.Click += new System.EventHandler(this.flip);
         }
 
