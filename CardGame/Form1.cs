@@ -16,29 +16,22 @@ namespace CardGame
     {
         public int turns = 0;                 //this is incremented by Card.flip()
         public int cardsFlipped = 0;
+        private int pairsFound = 0;           //this is incremented by Form.compare()
         public Card firstCard, secondCard;
-        private int pairsFound = 0;          //this is incremented by Form.compare()
+        private static System.Timers.Timer flipTimer = new System.Timers.Timer(2000);
         Card[] deck = new Card[52];
 
         public Form1()
         {
             InitializeComponent();
-            this.Load += new EventHandler(this.Form1_Load);
         }
 
-
-        private void Form1_Load(object sender, EventArgs e)
+        private void Form1_Load_1(object sender, EventArgs e)
         {
-
             createCards();
-
-            //shuffle();  testing adding shuffle @ end of create cards
-
             deal();
-
-
-            //lblTurn.Text = turn + " turn";
         }
+
 
         private void createCards()
         {
@@ -118,10 +111,6 @@ namespace CardGame
         private void deal()
         { 
 
-           /*Card test = new Card();
-
-            this.Controls.Add(test);
-            test.Show(); */
             int count = 0;
             for (int x = 0; x < 13; x++)
             {
@@ -130,8 +119,7 @@ namespace CardGame
                     deck[count].Parent = this;
                     deck[count].Left = x * 100 + 50;
                     deck[count].Top = y * 125 + 100;
-                    deck[count].Parent = this;
-                    this.Controls.Add(deck[count]);
+                    Controls.Add(deck[count]);
                     count++;
                 }
             } 
@@ -139,16 +127,18 @@ namespace CardGame
 
         public void compare(Card a, Card b)   //Called by Card.flip()
         {
+            flipTimer.Elapsed += timeUp;
+            flipTimer.Enabled = false;
+
             if (a.Value == b.Value)
             {
                 cardsFlipped = 0;
                 pairsFound++;
                 checkWin();
             }
-            else               //Need to implement a timer here
+            else               
             {
-                a.flipback();  //cardsFlipped set back to 0 by this method
-                b.flipback();
+                flipTimer.Enabled = true;
             }
         }
 
@@ -161,11 +151,19 @@ namespace CardGame
                     MessageBoxButtons.OK);
             }
         }
+
+
+        private void timeUp(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            firstCard.flipback();
+            secondCard.flipback();
+            flipTimer.Enabled = false;
+        }
     }
 
     public class Card : PictureBox
     {
-        public Form1 p;
+        public Form1 Parent; //Refers to PictureBox.Parent (deck[])
         public int Value;
         public Image Face;
         public bool flipped;
@@ -177,17 +175,17 @@ namespace CardGame
             this.Height = 100;
             this.Left = 0;
             this.Top = 0;
-            this.Image = global::CardGame.Properties.Resources.zblue_back;
+            this.Image = Properties.Resources.zblue_back;
             this.SizeMode = PictureBoxSizeMode.StretchImage;
             this.Face = face;
             this.Value = value;
             this.flipped = false;
-            this.Click += new System.EventHandler(this.flip);
+            this.Click += new System.EventHandler(flip);
         }
 
         public void flip(object sender, EventArgs e)
         {
-
+            var p = Parent;
             if (!flipped)
             {
 
@@ -200,7 +198,9 @@ namespace CardGame
                 }
                 else //if (p.cardsFlipped < 2)
                 {
+                    this.Image = this.Face;
                     p.secondCard = this;
+                    flipped = true;
                     p.turns++;
                     p.compare(p.firstCard, p.secondCard);
                 }
@@ -209,9 +209,10 @@ namespace CardGame
 
         public void flipback()
         {
+
             this.Image = global::CardGame.Properties.Resources.zblue_back;
             flipped = false;
-            p.cardsFlipped = 0;
+            Parent.cardsFlipped = 0;
         }
     }
 }
