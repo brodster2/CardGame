@@ -26,10 +26,30 @@ namespace CardGame
             InitializeComponent();
         }
 
+
+        private void gameReset()
+        {
+            if (deck[0] != null)
+            {
+                foreach (Card c in deck)
+                {
+                    Controls.Remove(c);
+                }
+                turns = 0;
+                turnLabel.Text = turns.ToString();
+                pairsFound = 0;
+                deck = new Card[52];
+                createCards();
+                deal();
+            }
+        }
+
         private void Form1_Load_1(object sender, EventArgs e)
         {
+            turnLabel.Text = turns.ToString();
             createCards();
             deal();
+            //debugWin();
         }
 
 
@@ -109,8 +129,8 @@ namespace CardGame
         }
 
         private void deal()
-        { 
-
+        {
+            
             int count = 0;
             for (int x = 0; x < 13; x++)
             {
@@ -134,24 +154,61 @@ namespace CardGame
             {
                 cardsFlipped = 0;
                 pairsFound++;
+
                 checkWin();
             }
             else               
             {
+                updateTurnLabel();
                 flipTimer.Enabled = true;
             }
         }
 
-        public void checkWin()  //Called by Form.compare()
+        private void updateTurnLabel()
         {
-            if (pairsFound == 26)
+            turns++;
+            turnLabel.Text = turns.ToString();
+        }
+
+        private void checkWin()  //Called by Form.compare()
+        {
+            if (pairsFound >= 26)
             {
-                MessageBox.Show("Congratulations you won",
+                DialogResult response = MessageBox.Show(
+                    "Congratulations you won \nPlay agin?",
                     "Your score is " + turns.ToString(),
-                    MessageBoxButtons.OK);
+                    MessageBoxButtons.YesNo);
+
+                if (response == DialogResult.Yes)
+                {
+                    gameReset();
+                }
             }
         }
 
+        private void debugWin()
+        {
+            pairsFound = 26;
+        }
+
+        private void newGameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            gameReset();
+        }
+
+        private void howToPlayToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string rules = "The aim of the game is to turn over the cards two at a time and try to match all the pairs." +
+                " If the value of the two cards (eg. ace and an ace) are equal the cards will stay facing up, otherwise the cards" +
+                " will flip back over and you will have to guess again. \nThe game is won when all the pairs are matched. Your" +
+                " score is the number of turns it took to find all the pairs. A turn where a matching pair is found doesn't count" +
+                " towards your score.\nHave fun!";
+            MessageBox.Show(rules,
+                "Rules",
+                MessageBoxButtons.OK);
+            
+            
+        }
 
         private void timeUp(Object source, System.Timers.ElapsedEventArgs e)
         {
@@ -163,7 +220,7 @@ namespace CardGame
 
     public class Card : PictureBox
     {
-        public Form1 Parent; //Refers to PictureBox.Parent (deck[])
+        public Form1 Parent; //Refers to PictureBox.Parent (deck[count].Parent)
         public int Value;
         public Image Face;
         public bool flipped;
@@ -196,12 +253,12 @@ namespace CardGame
                     flipped = true;
                     p.cardsFlipped++;
                 }
-                else //if (p.cardsFlipped < 2)
+                else if (p.cardsFlipped < 2)
                 {
                     this.Image = this.Face;
                     p.secondCard = this;
                     flipped = true;
-                    p.turns++;
+                    p.cardsFlipped++;
                     p.compare(p.firstCard, p.secondCard);
                 }
             }
